@@ -10,3 +10,5 @@ testpaths = [
 [tool.mypy]
 mypy_path = "src"
 ignore_missing_imports = true
+python_version = "3.8"
+follow_imports = "skip"
