@@ -21,16 +21,14 @@ def test_insert_record_rejects_invalid_input():
         operation.insert_record("not a record", "items")
 
 
-def test_bulk_insert_reads_csv_and_inserts_records():
+def test_bulk_insert_delegates_to_file_import():
     operation = mongo_operation("mongodb://localhost", "test", "items")
     collection = MagicMock()
-    dataframe = MagicMock()
-    dataframe.to_json.return_value = '[{"name":"example"}]'
 
-    with patch("mongodb_connect.mongo_crud.pd.read_csv", return_value=dataframe) as reader:
-        with patch.object(operation, "create_collection", return_value=collection):
-            operation.bulk_insert("records.csv")
+    with (
+        patch("mongodb_connect.mongo_crud.import_records") as importer,
+        patch.object(operation, "create_collection", return_value=collection),
+    ):
+        operation.bulk_insert("records.csv")
 
-    reader.assert_called_once_with("records.csv", encoding="utf-8")
-    dataframe.to_json.assert_called_once_with(orient="records")
-    collection.insert_many.assert_called_once_with([{"name": "example"}])
+    importer.assert_called_once_with("records.csv", collection)

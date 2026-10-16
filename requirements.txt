@@ -1,5 +1,1 @@
-pymongo
-dnspython
-pandas
-numpy
-ensure
+pymongo>=4.6,<5
